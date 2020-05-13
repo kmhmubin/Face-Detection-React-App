@@ -20,55 +20,61 @@ app.use(cors());
 
 app.use(bodyParser.json());
 
-const database = {
-  users: [
-    {
-      id: "123",
-      name: "jhon",
-      email: "jhon@gmail.com",
-      password: "cookies",
-      entries: 0,
-      joined: new Date(),
-    },
-    {
-      id: "124",
-      name: "sally",
-      email: "sally@gmail.com",
-      password: "bananas",
-      entries: 0,
-      joined: new Date(),
-    },
-  ],
-};
-
-app.get("/", (req, res) => {
-  res.send(database.users);
+app.get("/", (request, respond) => {
+  respond.send(database.users);
 });
 
+// sign in
 app.post("/signin", (request, respond) => {
-  if (
-    request.body.email === database.users[0].email &&
-    request.body.password === database.users[0].password
-  ) {
-    respond.json("success");
-  } else {
-    respond.status(400).json("error logging in");
-  }
+  db.select("email", "hash")
+    .from("login")
+    .where("email", "=", request.body.email)
+    .then((data) => {
+      const isValid = bcrypt.compareSync(request.body.password, data[0].hash);
+      if (isValid) {
+        return db
+          .select("*")
+          .from("users")
+          .where("email", "=", request.body.email)
+          .then((user) => {
+            respond.json(user[0]);
+          })
+          .catch((error) => respond.status(400).json("Unable to get user"));
+      } else {
+        respond.status(400).json("Wrong Credentials");
+      }
+    })
+    .catch((error) => respond.status(400).json("Wrong Credentials"));
 });
 
+//  register user to database
 app.post("/register", (request, respond) => {
   const { name, email, password } = request.body;
-  db("users")
-    .returning("*")
-    .insert({
-      email: email,
-      name: name,
-      joined: new Date(),
-    })
-    .then((user) => {
-      respond.json(user[0]);
-    })
-    .catch((error) => respond.status(400).json("unable to register"));
+  const hash = bcrypt.hashSync(password);
+
+  db.transaction((trx) => {
+    trx
+      .insert({
+        hash: hash,
+        email: email,
+      })
+      .into("login")
+      .returning("email")
+      .then((loginEmail) => {
+        return trx("users")
+          .returning("*")
+          .insert({
+            email: loginEmail[0],
+            name: name,
+            joined: new Date(),
+          })
+          .then((user) => {
+            respond.json(user[0]);
+          });
+      })
+      .then(trx.commit)
+      .catch(trx.rollback);
+  }).catch((error) => respond.status(400).json("unable to register"));
 });
 
 app.get("/profile/:id", (request, respond) => {
@@ -91,7 +97,7 @@ app.get("/profile/:id", (request, respond) => {
 app.put("/image", (request, respond) => {
   const { id } = request.body;
 
-  db("user")
+  db("users")
     .where("id", "=", id)
     .increment("entries", 1)
     .returning("entries")
