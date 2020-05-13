@@ -22,6 +22,7 @@ body-parser
 cors
 bcrypt-nodejs
 knex
+node-postgres or pg
 ```
 
 ### Dev Dependencies
