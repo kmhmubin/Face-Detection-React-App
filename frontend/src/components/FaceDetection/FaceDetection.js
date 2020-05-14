@@ -1,17 +1,11 @@
 import React from "react";
 import "./FaceDetectionBox.css";
 
-const FaceDetection = ({ imageURL, box }) => {
+const FaceDetection = ({ imageUrl, box }) => {
   return (
     <div className="center ma">
       <div className="absolute mt2">
-        <img
-          id="inputImage"
-          src={imageURL}
-          alt=""
-          width="500px"
-          height="auto"
-        />
+        <img id="inputimage" alt="" src={imageUrl} width="500px" heigh="auto" />
         <div
           className="bounding-box"
           style={{
