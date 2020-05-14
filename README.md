@@ -4,7 +4,7 @@ A simple face detect react app using [Clarifai](https://www.clarifai.com/) API.
 
 ## App Demo
 
-![]()
+![App Demo](https://github.com/kmhmubin/Face-Detection-React-App/blob/master/app%20demo.gif)
 
 ## Installation ⚙
 
