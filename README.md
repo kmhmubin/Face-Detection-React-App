@@ -2,11 +2,10 @@
 
 A simple face detect react app using [Clarifai](https://www.clarifai.com/) API.
 
-## Live Demo 👉 [Live](https://fdra.herokuapp.com/)
+## 👉 [Live Face Detection APP](https://fdra.herokuapp.com/)
 
 
-
-Server side of the app here.[Face Detection Reeact APP Backend](https://github.com/kmhmubin/Face-Detect-React-App-Backend)
+## Server side: [Face Detection Reeact APP Backend](https://github.com/kmhmubin/Face-Detect-React-App-Backend)
 
 ## App Demo
 
